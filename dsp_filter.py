@@ -1,9 +1,7 @@
-#!/usr/bin/env python
-
-
 from scipy import signal
 import matplotlib.pyplot as plt
 import numpy as np
+
 
 class Filter(object):
     """
@@ -11,12 +9,17 @@ class Filter(object):
     a digital filter.
     """
 	
-    def __init__(self, order, f_sample, f_cutoff):
+    def __init__(self, filter_type, order, f_sample, f_cutoff):
         """
-        Initializes a new filter object with filter coefficients in lists a and b.
+        Initializes a new filter object with filter coefficients 
+        in lists a and b.
         """
 
         # Input validation:
+        allowed_types = ['low', 'high']  # TODO support bandpass
+        if filter_type not in allowed_types:
+            raise Exception('Invalid type, should be in %s.' % allowed_types)
+
         if order < 1:
             raise Exception('Invalid filter order, should be >= 1!')
 
@@ -31,6 +34,7 @@ class Filter(object):
                                f_cutoff should be < f_sample / 2.""")
 
         # Actual calculation of the filter:
+        self.filter_type = filter_type
         self.a, self.b = self.calc_coefficients(order, f_sample, f_cutoff)
 
     def calc_coefficients(self, order, f_sample, f_cutoff):
@@ -44,7 +48,8 @@ class Filter(object):
 
         # Calculate normalized frequency instantly (skip conversion f -> w)
         w_pass = f_cutoff / (f_sample / 2)  # f_sample / 2 = f_nyquist
-        b, a = signal.butter(order, w_pass, 'low', analog=False)
+        # TODO add buttord here if stopband_dB is specified
+        b, a = signal.butter(order, w_pass, self.filter_type, analog=False)
         return a, b
 
     def get_a(self):
@@ -145,26 +150,3 @@ class Filter(object):
 
         figure.show()
 
-if __name__ == "__main__":
-    print("Starting script to calculate digital filter.")
-
-    # TODO add iir/fiir functionality, 
-    # TODO add category (butterworth / chebyshev, ...)
-    # TODO add type (lowpass, highpass, bandpass..)
-    order = int(input("Order of the filter: "))
-    f_sample = float(input("Enter sample rate frequency (in Hz): "))
-    f_cutoff = float(input("Enter cutoff frequency (in Hz): "))
-
-    # next line is only useful if you also use buttord along with butter 
-    # => higher filter order but stop band is properly defined.
-    # stopband_dB = float(input(("Enter desired amplitude in stop band (in Db): "))
-            
-    f = Filter(order, f_sample, f_cutoff)
-    f.simulate(20)
-
-    print("Filter calculated without errors.")
-    print("Filter coefficients:")
-    print("a: %s" % f.get_a())
-    print("b: %s" % f.get_b())
-    print()
-    input("Press enter to close script..")
