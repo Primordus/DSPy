@@ -4,12 +4,20 @@
 import sys
 from dsp_filter import Filter
 from band_filter import BandFilter
+from filter_builder import FilterBuilder
 
 
 def arg_defined(arg):
+    """
+    Checks if the arg is in the list of arguments this script was started with.
+    """
     return arg in sys.argv
 
 def show_help():
+    """
+    Shows the help menu
+    """
+
     print('USAGE: ./main.py [FLAGS]')
     print()
     print('Possible FLAGS:')
@@ -27,40 +35,15 @@ if __name__ == "__main__":
         exit()
 
     print("Starting script to calculate digital filter.")
-    f = None
 
-    # TODO add category (butterworth / chebyshev, ...)
-    filter_type = input("Enter type of the filter: ")
-    order = int(input("Order of the filter: "))
-    f_sample = float(input("Enter samplerate frequency (in Hz): "))
-    
-    # TODO refactor this part later.
-    if filter_type in ['bandpass', 'bandstop']:
-        f_cutoff1 = float(input("Enter first cutoff frequency (in Hz): "))
-        f_cutoff2 = float(input("Enter second cutoff frequency (in Hz): "))
-        f_cutoffs = [f_cutoff1, f_cutoff2]
-
-        # next line is only useful if you also use buttord along with butter 
-        # => higher filter order but stop band is properly defined.
-        # stopband_dB = float(input(("Enter desired amplitude in stop band (in Db): "))
-
-        f = BandFilter(filter_type, order, f_sample, f_cutoffs)
-    else:
-        f_cutoff = float(input("Enter cutoff frequency (in Hz): "))
-
-        # next line is only useful if you also use buttord along with butter 
-        # => higher filter order but stop band is properly defined.
-        # stopband_dB = float(input(("Enter desired amplitude in stop band (in Db): "))
-
-        f = Filter(filter_type, order, f_sample, f_cutoff)
-    
-    f.simulate(20)
+    dsp_filter = FilterBuilder.build()    
+    dsp_filter.simulate(20)
 
     print("Filter calculated without errors.")
     print()
     print("Filter coefficients:")
-    print("a: %s" % f.get_a())
-    print("b: %s" % f.get_b())
+    print("a: %s" % dsp_filter.get_a())
+    print("b: %s" % dsp_filter.get_b())
     print()
     input("Press enter to close script..")
     
