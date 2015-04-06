@@ -15,7 +15,7 @@ def arg_defined(arg):
 
 def show_help():
     """
-    Shows the help menu
+    Shows the help menu.
     """
 
     print('USAGE: ./main.py [FLAGS]')
